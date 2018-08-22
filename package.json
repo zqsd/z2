@@ -1,0 +1,16 @@
+{
+    "name": "z2",
+    "version": "0.0.1",
+    "description": "Z2 geography library",
+    "main": "main.js",
+    "scripts": {
+        "test": "mocha test"
+    },
+    "devDependencies": {
+        "chai": "^1.5.0",
+        "mocha": "^5.2.0"
+    },
+    "dependencies": {
+        "test": "^0.6.0"
+    }
+}
