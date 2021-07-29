@@ -1,4 +1,4 @@
-export interface BoundInterface {
+export interface BoundsInterface {
     minLat: number;
     maxLat: number;
     minLng: number;
@@ -16,8 +16,10 @@ export declare class Cell {
     min(): Cell;
     max(): Cell;
     static fromTile(x: number, y: number, z: number): Cell;
-    static fromBoundsToGoogleTile(bounds: BoundInterface): Cell;
+    static fromBoundsToCustomTile(bounds: BoundsInterface, customNumTiles: number[]): Cell;
+    static fromLatLngToCustomTile(lat: number, lng: number, z: number | undefined, customNumTiles: number[]): Cell;
     static fromLatLngToGoogleTile(lat: number, lng: number, z?: number): Cell;
+    static fromBoundsToGoogleTile(bounds: BoundsInterface): Cell;
     static fromBinary(bin: string): Cell;
     toBinary(): string;
     equals(b: Cell): boolean;

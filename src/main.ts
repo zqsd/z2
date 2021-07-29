@@ -1,9 +1,9 @@
 // source https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#ECMAScript_.28JavaScript.2FActionScript.2C_etc..29
-function long2tile(lon: number, zoom: number) : number {
-    return Math.floor((lon + 180) / 360 * Math.pow(2, zoom));
+function long2tile(lon: number, numTiles: number) : number {
+    return Math.floor((lon + 180) / 360 * numTiles);
 }
-function lat2tile(lat: number, zoom: number) : number {
-    return Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
+function lat2tile(lat: number, numTiles: number) : number {
+    return Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * numTiles);
 }
 function tile2long(x: number, z: number) : number {
     return (x / Math.pow(2, z) * 360 - 180);
@@ -13,12 +13,16 @@ function tile2lat(y: number, z: number) : number {
     return 180 / Math.PI * Math.atan(0.5 *(Math.exp(n) - Math.exp(-n)));
 }
 
-export interface BoundInterface {
+export interface BoundsInterface {
     minLat: number,
     maxLat: number,
     minLng: number,
     maxLng: number,
 }
+
+// power of two until power 26 (max z)
+const GOOGLE_TILES = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864];
+
 
 /*
  * Stores a (x, y) couple at a z level, into a 53 bits number (maximum safe integer in javascript)
@@ -98,13 +102,13 @@ export class Cell {
 
     static fromTile(x: number, y: number, z: number) : Cell {
         if(z < 0 || z > 26) {
-            throw `Incorrect level z=${z}`;
+            throw new Error(`Incorrect level z=${z}`);
         }
         if(x < 0 || x >= Math.pow(2, z)) {
-            throw 'x out of bounds';
+            throw new Error('x out of bounds');
         }
         if(y < 0 || y >= Math.pow(2, z)) {
-            throw 'x out of bounds';
+            throw new Error('x out of bounds');
         }
 
         let bin = '';
@@ -125,26 +129,36 @@ export class Cell {
         return cell;
     }
 
-    static fromBoundsToGoogleTile(bounds: BoundInterface) : Cell {
+    static fromBoundsToCustomTile(bounds: BoundsInterface, customNumTiles: number[]) : Cell {
         for(let z = 26; z > 0; z--) {
-            const x0 = long2tile(bounds.minLng, z),
-                  y0 = lat2tile(bounds.minLat, z),
-                  x1 = long2tile(bounds.maxLng, z),
-                  y1 = lat2tile(bounds.maxLat, z);
+            const numTiles = customNumTiles[z];
+            const x0 = long2tile(bounds.minLng, numTiles),
+                  y0 = lat2tile(bounds.minLat, numTiles),
+                  x1 = long2tile(bounds.maxLng, numTiles),
+                  y1 = lat2tile(bounds.maxLat, numTiles);
             if(x0 === x1 && y0 === y1)
                 return Cell.fromTile(x0, y0, z);
         }
-        throw 'fin';
+        throw new Error('Failed to tile from bounds');
     }
 
-    static fromLatLngToGoogleTile(lat: number, lng: number, z: number = 26) : Cell {
+    static fromLatLngToCustomTile(lat: number, lng: number, z: number = 26, customNumTiles: number[]) : Cell {
         if(z > 26) {
             throw `Level ${z} incorrect`;
         }
 
-        const x = long2tile(lng, z),
-              y = lat2tile(lat, z);
+        const numTiles = customNumTiles[z];
+        const x = long2tile(lng, numTiles),
+              y = lat2tile(lat, numTiles);
         return Cell.fromTile(x, y, z);
+    }
+
+    static fromLatLngToGoogleTile(lat: number, lng: number, z: number = 26) {
+        return Cell.fromLatLngToCustomTile(lat, lng, z, GOOGLE_TILES);
+    }
+
+    static fromBoundsToGoogleTile(bounds: BoundsInterface) {
+        return Cell.fromBoundsToCustomTile(bounds, GOOGLE_TILES);
     }
 
     static fromBinary(bin: string) : Cell {
