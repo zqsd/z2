@@ -2,8 +2,10 @@
     "name": "z2",
     "version": "0.0.1",
     "description": "Z2 geography library",
-    "main": "main.js",
+    "main": "./lib/main.js",
+    "types": "./lib/main.d.ts",
     "scripts": {
+        "build": "tsc",
         "test": "mocha test"
     },
     "devDependencies": {
@@ -11,6 +13,7 @@
         "mocha": "^5.2.0"
     },
     "dependencies": {
-        "test": "^0.6.0"
+        "test": "^0.6.0",
+        "typescript": "^4.3.5"
     }
 }
