@@ -100,14 +100,14 @@ export class Cell {
         return cell;
     }
 
-    static fromTile(x: number, y: number, z: number) : Cell {
+    static fromTile(x: number, y: number, z: number, customNumTiles: number[] = GOOGLE_TILES) : Cell {
         if(z < 0 || z > 26) {
             throw new Error(`Incorrect level z=${z}`);
         }
-        if(x < 0 || x >= Math.pow(2, z)) {
+        if(x < 0 || x >= customNumTiles[z]) {
             throw new Error('x out of bounds');
         }
-        if(y < 0 || y >= Math.pow(2, z)) {
+        if(y < 0 || y >= customNumTiles[z]) {
             throw new Error('x out of bounds');
         }
 
@@ -137,7 +137,7 @@ export class Cell {
                   x1 = long2tile(bounds.maxLng, numTiles),
                   y1 = lat2tile(bounds.maxLat, numTiles);
             if(x0 === x1 && y0 === y1)
-                return Cell.fromTile(x0, y0, z);
+                return Cell.fromTile(x0, y0, z, customNumTiles);
         }
         throw new Error('Failed to tile from bounds');
     }
@@ -150,7 +150,7 @@ export class Cell {
         const numTiles = customNumTiles[z];
         const x = long2tile(lng, numTiles),
               y = lat2tile(lat, numTiles);
-        return Cell.fromTile(x, y, z);
+        return Cell.fromTile(x, y, z, customNumTiles);
     }
 
     static fromLatLngToGoogleTile(lat: number, lng: number, z: number = 26) {

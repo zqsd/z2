@@ -60,6 +60,15 @@ describe('Cell', () => {
         expect(b.id).to.equal(5112853556098048);
     });
 
+    it('fromLatLngToGoogleTile', () => {
+        const a = Cell.fromLatLngToCustomTile(43.61092, 3.87723, 1, [13, 77]);
+        expect(a.x).to.equal(39);
+        expect(a.y).to.equal(28);
+        expect(a.z).to.equal(1);
+        expect(a.toBinary()).to.equal('10100000000000000000000000000000000000000000000000000');
+        expect(a.id).to.equal(5629499534213120);
+    });
+
     it('can be compared', () => {
         const a = new Cell(),
               a2 = Cell.fromTile(0, 0, 0),

@@ -15,7 +15,7 @@ export declare class Cell {
     get id(): number;
     min(): Cell;
     max(): Cell;
-    static fromTile(x: number, y: number, z: number): Cell;
+    static fromTile(x: number, y: number, z: number, customNumTiles?: number[]): Cell;
     static fromBoundsToCustomTile(bounds: BoundsInterface, customNumTiles: number[]): Cell;
     static fromLatLngToCustomTile(lat: number, lng: number, z: number | undefined, customNumTiles: number[]): Cell;
     static fromLatLngToGoogleTile(lat: number, lng: number, z?: number): Cell;
